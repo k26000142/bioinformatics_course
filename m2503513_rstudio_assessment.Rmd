@@ -1,0 +1,292 @@
+---
+title: "Advanced Bioinformatics 2026 Assessment"
+author: "m2503513"
+date: "2026-03-24"
+output:
+  html_document: default
+---
+
+# General R/Rstudio Assessment
+
+#### Loading the libraries required throughout the General R/Rstudio Assessment.
+
+```{r}
+#Load the ggplot library
+library(ggplot2)
+
+```
+
+## Task 1 Sum of the integers between 5 and 55
+
+In task 1, the (5:55) creates a vector containing the integers between 5 and 55 and the sum() takes this vector and adds them together.
+
+```{r}
+#An expression that evaluates the sum of all integers between 5 and 55
+
+sum(5:55)
+```
+
+## Task 2 Sum of all integers between 5 and n
+
+In task 2, a function called sumfun is created to add the integers between 5 and n and then result the results. To execute the sumfun function for the variables 10, 20, 100, three variables called results_10, results_20, results_100 are created to store the results from sumfun(10), sumfun(20), sumfun(100). To present the results, results_10, results_20, results_100 are called.
+
+```{r}
+#Create a function that calculates the sum of all integers between 5 and n
+
+sumfun <- function(n) {
+  results <- sum(5:n)
+  return(results)
+}
+
+#Execute the function for the variables n=10, n=20, n=100
+results_10 <- sumfun(10)
+results_20 <- sumfun(20)
+results_100 <- sumfun(100)
+
+#Present the results of the function
+results_10
+results_20
+results_100
+```
+
+## Task 3 Fibonacci series
+
+In task 3, a variable called fibonacci is created to hold the integers of the first 12 entries of the Fibonacci series. The first 2 entries of fibonacci are assigned the values 1 and 1 as these are the first 2 entries of the Fibonacci series. Next, a for loop is used to iterate over the remaining indices (3:12), assigning it the sum of the two previous entries.
+
+```{r}
+#Initialise a vector for the first 12 entries of the Fibonacci series 
+fibonacci <- numeric(12)
+fibonacci[1] <- 1
+fibonacci[2] <- 1
+
+#Create a for loop to calculate the remaining 10 numbers
+for (i in 3:12) {
+  fibonacci[i] <- fibonacci[i-1] + fibonacci[i-2]
+}
+
+#Print the first 12 entries of the Fibonacci series 
+fibonacci
+
+```
+
+## Task 4 Visualisation of mpg by gear
+
+In task 4, ggplot was used to visualise the relationship between mpg and gears in the mtcars data set. The gears variable was converted from a numerical variable into a factorial variable so it is treated as discrete and not continuous. gears was assigned to the x axis, mpg was assigned to the y axis and fill aesthetic was used to colour each box based on gears.
+
+```{r}
+#Generate a box plot of mpg as a function of gears
+ggplot(mtcars, aes(x = factor(gear), y = mpg, fill = factor(gear))) +
+  geom_boxplot() +
+  labs(x = "Number of Gears", y = "Miles per Gallon (mpg)", fill = "Gears", title = "Miles per Gallon (mpg) vs Number of Gears")
+```
+
+## Task 5 Linear relationship between speed and distance
+
+In task 5, a variable called cars_linear_model is created to store the results. The lm function was used to model the linear relationship between dist and speed, which is found cars data set. The summary function was used to determine the fitted sloped and intercept of the line, as well as their standard deviations. Next the help function was used to determine the units of distance (ft) and speed (mph).
+
+#### What are the fitted slope and intercept of the line, and their standard errors?
+
+Fitted slope: 3.9324, std. error 0.4155. Intercept: -17.5791, std. error 6.7584.
+
+#### What are the units used for the variables in the dataset?
+
+Speed: mph. Distance: ft.
+
+```{r}
+#Fit linear model between distance and speed
+cars_linear_model <- lm(dist ~ speed, data = cars)
+
+#Print the summary results
+summary(cars_linear_model)
+
+#Help about the cars data set
+help("cars")
+```
+
+## Task 6 Visualisation of speed (mph) and distance
+
+In task 6, ggplot was used to visualise the linear relationship between speed (mph) and distance in the cars data set. The intercept_value and fitted_slope_value variables were created to store the respective coefficients in the cars_linear_model variable created in task 5. The coef function was used to determine the coefficients. speed was assigned to the x axis and dist was assigned to the y axis. geom_point plotted the points, geom_abline fitted the line of best fit based on intercept_value and fitted_slope_value.
+
+```{r}
+#Extract values from cars_linear_model
+intercept_value <- coef(cars_linear_model)[1]
+fitted_slope_value <- coef(cars_linear_model)[2]
+
+#Generate a linear plot of speed and distance
+ggplot(cars, aes(x = speed, y = dist)) +
+  geom_point() +
+  geom_abline(intercept = intercept_value, slope = fitted_slope_value) +
+  labs(x = "Speed (mph)", y = "Distance (ft)", title = "Vehicle Stopping Distances")
+```
+
+## Task 7 Calculation of average reaction time & visualisation of speed (fps) and distance
+
+In task 7, speed was converted from mph to ft per seconds (fps) to ensure speed and distance are using equivalent units. A variable called reaction_linear_model is used to store the results. The lm function was used to model the linear relationship between dist and the sum of speed_fps and square of speed_fps. This is because the total distance is the sum of the reaction and braking distance. The -1 forces the lm function to intercept at 0,0. This is because when speed is 0, distance is 0. The summary function was used to visualise the speed_fps coefficient. The reaction_time variable was created to store the coefficient of speed_fps.
+
+```{r}
+#Convert speed from to ft per second.
+cars$speed_fps <- cars$speed * 1.467
+
+#Fit linear model between 
+reaction_linear_model <- lm(dist ~ speed_fps + I(speed_fps^2) -1, data = cars)
+
+#Print the summary results
+summary(reaction_linear_model)
+
+#Extract reaction time from reaction_linear_model
+reaction_time <- coef(reaction_linear_model)[1]
+reaction_time
+```
+
+In the continuation of task 7, ggplot was used to visualise the linear relationship between speed (fps) and distance. speed_fps was assigned the x axis and dist was assigned the y axis. geom_point plotted the points. geom_smooth fitted a curved line. It used a linear model (method = lm), and the formula y \~ x + I(x\^2) -1 as explained above.
+
+```{r}
+#Generate a linear plot of speed_fps and distance
+ggplot(cars, aes(x = speed_fps, y = dist)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2) -1) +
+  labs(x = "Speed (fps)", y = "Distance (ft)", title = "Speed (fps) vs Distance (ft)")
+```
+
+# RNA-seq Assessment
+
+The data must be downloaded and extracted.
+
+#### Loading the libraries required throughout the RNA-seq Assessment.
+
+```{r}
+suppressPackageStartupMessages({
+  library(DESeq2)
+  library("pheatmap")
+  library(ggplot2)
+  library("RColorBrewer")
+})
+```
+
+## Task 8 Read in count data and sample description
+
+In task 8, the read.csv function was used to extract the data from exercise1_counts.csv and stored it in the variable all_counts. The read.table function was used to extract the data from exercise1_sample_description.info and stored it in the variable sam_descript. The head, dim and class functions were used to explore the data in all_counts and sam_descript.
+
+```{r}
+#Read in count data
+all_counts <- read.csv(file = "C:/Users/katem/Downloads/LMS_RNAseq_short-master-2023-final/LMS_RNAseq_short-master-2023-final/course/exercises/data/exercise1_counts.csv", header = T, row.name = 1)
+head(all_counts)
+dim(all_counts)
+class(all_counts)
+
+#Read in sample description
+sam_descript <- read.table(file = "C:/Users/katem/Downloads/LMS_RNAseq_short-master-2023-final/LMS_RNAseq_short-master-2023-final/course/exercises/data/exercise1_sample_description.info", sep = "\t", header = TRUE)
+head(sam_descript)
+dim(sam_descript)
+class(sam_descript)
+```
+
+## Task 9 Create col_data and check dimensions
+
+In task 9, the data.frame function was used to create a data frame from the sample, condition and batch data in the sam_descipt variable. This was stored in a new variable called col_data. The head function was used to visualise the col_data data frame. The as.factor function was used to convert the data in col_data into factors. This is so the data is treated as discrete and not continuous. Next, the dimensions of all_counts and col_data are compared to ensure they are in the same order. If they are, it will return TRUE.
+
+```{r}
+#Create col_data from sam_descript
+col_data <- data.frame(sample = sam_descript$sample, condition = sam_descript$condition, batch = sam_descript$batch)
+head(col_data)
+
+#Store data as factors
+col_data$sample <- as.factor(col_data$sample)
+col_data$condition <- as.factor(col_data$condition)
+col_data$batch <- as.factor(col_data$batch)
+
+#Check the dimensions
+all(colnames(all_counts) == col_data$name)
+```
+
+## Task 10 Construct DESeqDataSet object
+
+In task 10, the DESeqDataSetFromMatrix function is used to merge all the data which is stored in the variable dds.
+
+```{r}
+#Construct DESeqDataSet object using count data and sample description
+dds <- DESeqDataSetFromMatrix(countData = all_counts, colData = col_data, design = ~condition)
+dds
+```
+
+## Task 11 Perform rlog and VST transformation on the data
+
+In task 11, the rlog and varianceStabilizingTransformation functions are used to transform the data in the dds variable. This normalises the data so it can be statistically analysed. The data is stored in the rld and vsd variables respectively. Next the assay function is used on the rld and vsd to get each into a count format. The data is stored in the rld_counts and vsd_counts variables respectively.
+
+```{r}
+#rlog transformation
+rld <- rlog(dds)
+
+# Get rld in count format
+rld_counts <- assay(rld)
+
+#VST transformation
+vsd <- varianceStabilizingTransformation(dds)
+
+# Get vst in count format
+vsd_counts <- assay(vsd)
+```
+
+## Task 12 Visualisation of top 40 highly expressed genes in a heatmap
+
+In task 12, the DESeq function was used to normalise the data in dds and updates the dds variable to store it. The counts function was used to get the normalised counts from the dds variable and stored the data in the dds_counts variable. The order function was used to sort the rows in dds_counts in descending order according to the mean. The [1:40] selects the top 40 highly expressed genes and this data is stored in the select variable. The head function is used to visualise the dds_count and select variables. The pheatmap function is used the generate a heatmap of the rld and vsd transformed data.
+
+```{r fig.height=12, fig.width=6}
+# Apply DESeq normalisation
+dds <- DESeq(dds)
+
+#Get dds normalised counts
+dds_counts <- counts(dds, normalized = TRUE)
+head(dds_counts)
+
+#Normalised counts for top 40 highly expressed genes
+select <- order(rowMeans(dds_counts), decreasing = TRUE)[1:40]
+head(select)
+
+#Generate a heatmap
+pheatmap(assay(rld)[select, ], main = "Top 40 Genes (rlog)")
+pheatmap(assay(vsd)[select, ], main = "Top 40 Genes (VST)")
+```
+
+## Task 13 Generate a standard distance matrix (SDM) to see the clustering of count data
+
+In task 13, the dist function was used to transpose the rlog transformed data to get sample-to sample distances which was stored in the variable sample_dist. The as.matrix function was use to convert sample_dist into a matrix, which was stored in the variable sdm. The row names in the sdm variable use the condition in rld, whilst there were no column names. The colorRampPalette function created a custom blue colour palette consisting of 9 shades, which is based off a spectrum of 255 shades. This was assigned to the variable colours. The pheatmap function generates a heatmap using data from sdm, the distance between rows and columns uses the pre-calculated data from sample_dist and the custom colour palettes is used.
+
+```{r}
+# Calculate SDM from rlog transformed data
+sample_dist <- dist(t(assay(rld)))
+
+# Get SDM in matrix form
+sdm <- as.matrix(sample_dist)
+
+# Addition of row names for a clear plot
+rownames(sdm) <- rld$condition
+colnames(sdm) <- NULL
+
+# Addition of colours
+colours <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+# Generate heatmap
+pheatmap(sdm, clustering_distance_rows = sample_dist, clustering_distance_cols = sample_dist, col = colours)
+```
+
+## Task 14 Perform the Principal Component Analysis (PCA) using rlog method and find out the % significance values of first two principal components
+
+In task 14, the plotPCA fucntion is used to perform PCA on the rlog transformed data, which is grouped and coloured based on condition.
+
+```{r}
+#PCA using rlog transformed data
+pca_rld <- plotPCA(rld, intgroup = "condition")
+pca_rld
+```
+
+## Task 15 Perform the Principal Component Analysis (PCA) using VST method. Compare the plot with the ones obtained using the rlog method
+
+In task 15, the plotPCA function is used to perform PCA on the VST transformed data, which is grouped and coloured based on condition. The PCA plot generated using the rlog method showed PC1 explained 70% of the variance and PC2 explained 13% of the variance. This is similar to the PCA plot generated using the VST method; PC1 explained 69% of the variance and PC2 explained 14% of the variance. Both methods suggest PC1 explains a greater proportion of the variance compared to PC2.
+
+```{r}
+#PCA using VST transformed data
+pca_vsd <- plotPCA(vsd, intgroup = "condition")
+pca_vsd
+```
+
